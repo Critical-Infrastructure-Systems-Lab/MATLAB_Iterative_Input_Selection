@@ -23,7 +23,7 @@ Based on work from the following papers:
 
 Acknowledgements to Dr. Matteo Giuliani (Politecnico di Milano) and Riccardo Taormina (Hong Kong Polytechnic University)
 
-Copyright 2014 Stefano Galelli, Assistant Professor, Singapore University of Technology and Design, stefano_galelli@sutd.edu.sg ([Link to Homepage](http://people.sutd.edu.sg/~stefano_galelli/index.html)).
+Copyright 2014 Stefano Galelli, Assistant Professor, Singapore University of Technology and Design, E-mail: stefano_galelli@sutd.edu.sg ([Link to Homepage](http://people.sutd.edu.sg/~stefano_galelli/index.html)).
 
 This file is part of MATLAB_IterativeInputSelection.
 
