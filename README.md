@@ -16,12 +16,12 @@ Contents:
 * `Friedman_dataset.txt`: sample dataset, with 10 candidate inputs (first 10 columns) and 1 output (last column). The observations, arranged by rows, are 250.
 
 Based on work from the following papers:
-Galelli, S., and A. Castelletti (2013a), Tree-based iterative input variable selection for hydrological modeling, Water Resour. Res., 49(7), 4295-4310.
-([Link to Paper](http://onlinelibrary.wiley.com/doi/10.1002/wrcr.20339/abstract))
-Galelli, S., and A. Castelletti (2013b), Assessing the predictive capability of randomized tree-based ensembles in streamflow modelling, Hydrol. Earth Syst. Sci., 17, 2669-2684.
-([Link to Paper](http://www.hydrol-earth-syst-sci.net/17/2669/2013/hess-17-2669-2013.html))
-Geurts, P., D. Ernst, and L. Wehenkel (2006), Extremely randomized trees, Mach. Learn., 63(1), 3-42
-([Link to Paper](http://link.springer.com/article/10.1007/s10994-006-6226-1))
+
+Galelli, S., and A. Castelletti (2013a), Tree-based iterative input variable selection for hydrological modeling, Water Resour. Res., 49(7), 4295-4310. ([Link to Paper](http://onlinelibrary.wiley.com/doi/10.1002/wrcr.20339/abstract))
+
+Galelli, S., and A. Castelletti (2013b), Assessing the predictive capability of randomized tree-based ensembles in streamflow modelling, Hydrol. Earth Syst. Sci., 17, 2669-2684. ([Link to Paper](http://www.hydrol-earth-syst-sci.net/17/2669/2013/hess-17-2669-2013.html))
+
+Geurts, P., D. Ernst, and L. Wehenkel (2006), Extremely randomized trees, Mach. Learn., 63(1), 3-42 ([Link to Paper](http://link.springer.com/article/10.1007/s10994-006-6226-1))
 
 Acknowledgements to Dr. Matteo Giuliani (Politecnico di Milano) and Riccardo Taormina (Hong Kong Polytechnic University)
 
