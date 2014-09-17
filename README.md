@@ -6,11 +6,6 @@ The MATLAB_IterativeInputSelection toolbox is a MatLab implementation of the Ite
 The MATLAB_IterativeInputSelection toolbox requires the MATLAB_ExtraTrees toolbox, which can be found at https://github.com/rtaormina/MATLAB_ExtraTrees.
 
 
-!!!!! ATTENTION !!!!!
-A FASTER VERSION OF THE IIS ALGORITHM THAT EMPLOYS Extra-Trees WRITTEN IN C IS NOW AVAILABLE AT https://github.com/stefano-galelli/MATLAB_IterativeInputSelection_with_Rtree-c.
-
-
-
 Contents of MATLAB_IterativeInputSelection :
 * `script_example.m`: show how to use the available functions on a sample dataset (Friedman_dataset.txt).
 * `crossvalidation_extra_tree_ensemble.m`: run a k-fold cross-validation for an ensemble of Extra-Trees.
