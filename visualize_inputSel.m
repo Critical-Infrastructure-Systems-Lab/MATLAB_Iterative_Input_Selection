@@ -28,7 +28,7 @@ function [X, R2] = visualize_inputSel( iis_res, Nvar, Nrun, max_iter, map )
 % http://people.sutd.edu.sg/~stefano_galelli/index.html
 % Research Fellow, Politecnico di Milano
 % matteo.giuliani@polimi.it
-% http://home.deib.polimi.it/giuliani/
+% http://giuliani.faculty.polimi.it
 %
 %
 % Please refer to README.txt for further information.

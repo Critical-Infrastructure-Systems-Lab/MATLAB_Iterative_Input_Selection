@@ -135,6 +135,34 @@ axis([min(data_sh(:,end)) max(data_sh(:,end)) min(data_sh(:,end)) max(data_sh(:,
 xlabel('measured'); ylabel('predicted');
 title('calibration - scatter plot');
 
+%% repeated random sub-sampling validation
+
+% Define the parameters for the cross-validation
+ns   = 5; % number of repetitions
+flag = 1; % if flag == 1, an ensemble is built on the whole dataset at the end of the cross-validation. 
+          % Otherwise (flag == 0), such model is not built.
+
+% Run the repeated random sub-sampling validation
+[model] = repeatedRandomSubSamplingValidation_extra_tree_ensemble(data,M,k,nmin,ns,flag)
+
+% Model performance in calibration and validation
+model.cross_validation.performance.Rt2_cal_pred_mean  % 
+model.cross_validation.performance.Rt2_val_pred_mean  % 
+
+% Graphical analysis
+figure;
+subplot(211)
+plot(data_sh(:,end),'.-'); hold on; plot(model.complete_model.trajectories,'.-r'); grid on;
+axis([1 length(data_sh) min(data_sh(:,end)) max(data_sh(:,end))]);
+xlabel('time'); ylabel('output');
+legend('measured','predicted');
+title('calibration - trajectory');
+subplot(212)
+plot(model.complete_model.trajectories,data_sh(:,end),'.'); grid on
+axis([min(data_sh(:,end)) max(data_sh(:,end)) min(data_sh(:,end)) max(data_sh(:,end))]); 
+xlabel('measured'); ylabel('predicted');
+title('calibration - scatter plot');
+
 
 
 %% Input ranking
