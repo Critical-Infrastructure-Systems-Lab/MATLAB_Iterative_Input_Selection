@@ -5,11 +5,13 @@
 % https://github.com/rtaormina/MATLAB_ExtraTrees.
 %
 %
-% Copyright 2014 Stefano Galelli
+% Copyright 2014 Stefano Galelli and Matteo Giuliani
 % Assistant Professor, Singapore University of Technology and Design
 % stefano_galelli@sutd.edu.sg
 % http://people.sutd.edu.sg/~stefano_galelli/index.html
-%
+% Research Fellow, Politecnico di Milano
+% matteo.giuliani@polimi.it
+% http://giuliani.faculty.polimi.it
 %
 % Please refer to README.txt for further information.
 %
@@ -200,8 +202,11 @@ max_iter = 6;   % maximum number of iterations
 % Shuffle the data
 data_sh = shuffle_data(data);
 
-% Run the IIS algorithm
-[result_iis] = iterative_input_selection(data_sh,M,nmin,ns,p,epsilon,max_iter);
+% Run the IIS algorithm with k-fold validation (last input = 1)
+[result_iis] = iterative_input_selection(data_sh,M,nmin,ns,p,epsilon,max_iter,1);
+% for running the IIS algorithm with repeated random sub-sampling
+% validation, the last input must be = 2:
+% [result_iis] = iterative_input_selection(data_sh,M,nmin,ns,p,epsilon,max_iter,2);
 
 % Exit condition
 result_iis.exit_condition
@@ -480,7 +485,7 @@ end
 [X, R2] = visualize_inputSel(results_iis_n, max_iter, mult_runs, max_iter, 'Jet' );
 
 
-% This code has been written by Stefano Galelli.
+% This code has been written by Stefano Galelli, Matteo Giuliani
 
 
 
