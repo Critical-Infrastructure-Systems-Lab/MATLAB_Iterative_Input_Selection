@@ -1,7 +1,5 @@
-function [model] = crossvalidation_extra_tree_ensemble(subset,M,k,nmin,ns,flag)
-
-
-% This function cross-validate an ensemble of Exra-Trees 
+function [model] = crossvalidation_extra_tree_ensemble(subset,M,k,nmin,ns,flag,problemType,inputType)
+% This function cross-validates an ensemble of Exra-Trees 
 %
 % Inputs: 
 % subset = observations
@@ -9,12 +7,17 @@ function [model] = crossvalidation_extra_tree_ensemble(subset,M,k,nmin,ns,flag)
 % k      = number of random cut-directions 
 % nmin   = minimum number of points per leaf 
 % ns     = number of folds in the k-fold cross-validation process 
-% flag   = if flag == 1, the model is then evaluated (and saved) on the
-% full dataset
+% flag   = if flag == 1, the model is then evaluated (and saved) on the full dataset
+% problemType = specify problem type (1 for regression, zero for classification)
+% inputType   = binary vector indicating feature type(0:categorical,1:numerical)
+% only include input type for classification problems
 %
 % Output: 
 % model  = structure containing models and performance 
 %
+% Copyright 2015 Ahmad Alsahaf
+% Research fellow, Politecnico di Milano
+% ahmadalsahaf@gmail.com
 %
 % Copyright 2014 Stefano Galelli
 % Assistant Professor, Singapore University of Technology and Design
@@ -42,103 +45,11 @@ function [model] = crossvalidation_extra_tree_ensemble(subset,M,k,nmin,ns,flag)
 %     If not, see <http://www.gnu.org/licenses/>.
 % 
 
-
-
-% 0) SET THE PROBLEM PARAMETERS FOR THE ENSEMBLE CROSS-VALIDATION
-
-% Number of lines characterizing an alternative (a single fold)
-l = floor(length(subset)/ns);
-
-% Re-define the subset matrix
-subset = subset(1:l*ns,:);
-
-
-% 1) INITIALIZATION OF THE OUTPUT VARIABLES 
-
-% Initialize R2 AND RMSE VECTORS
-Rt2_cal_pred = zeros(ns,1); 
-Rt2_val_pred = zeros(ns,1); 
-
-% Initialize the function output
-model.cross_validation.performance = [];
-
-
-% 2) MODEL CONSTRUCTION AND EVALUATION OF THE PERFORMANCES (k-fold cross-validation)
-% Counter
-% disp('Start cross-validation:')
-
-for i = 1:ns
-
-    % Counter
-    % disp('Start cross-validation:'); disp(i);
-
-    % Define the calibration and validation data-set
-    % Calibration
-    if (i > 1) && (i < ns)
-        subset_tar = [subset(i*l+1:end,:) ; subset(1:(i-1)*l,:)];
-    else if i == 1
-            subset_tar = subset(i*l+1:end,:);
-        else
-            subset_tar = subset(1:(i-1)*l,:);
-        end
-    end
+if problemType == 0
+    [model] = crossvalidation_extra_tree_ensemble_r(subset,M,k,nmin,ns,flag);
     
-    % Validation
-    subset_val = subset((i-1)*l+1:i*l,:);
-
-    % Ensemble building + test the ensemble on the calibration dataset
-    [ensemble,finalResult_cal_pred] = buildAnEnsemble(M,k,nmin,subset_tar);
-     Rt2_cal_pred(i)                = Rt2_fit(subset_tar(:,end),finalResult_cal_pred);    
-    
-    % Test the ensemble on the validation data-set     
-    [finalResult_val_pred] = predictWithAnEnsemble(ensemble,subset_val);        
-    Rt2_val_pred(i)        = Rt2_fit(subset_val(:,end),finalResult_val_pred);
-
-end
-
-% Average R2
-model.cross_validation.performance.Rt2_cal_pred = Rt2_cal_pred;
-model.cross_validation.performance.Rt2_val_pred = Rt2_val_pred;
-model.cross_validation.performance.Rt2_cal_pred_mean = mean(Rt2_cal_pred);
-model.cross_validation.performance.Rt2_val_pred_mean = mean(Rt2_val_pred);
-
-
-% 3) MODEL CONSTRUCTION ON THE WHOLE DATA-SET
-
-% Check if is necessary to test the model on the whole data-set
-if flag == 1
-
-    % Add new fields to the function output
-    model.complete_model.ensemble      = [];
-    model.complete_model.trajectories  = [];
-    model.complete_model.performance   = [];
-
-    % Counter
-    % disp('Building and testing the final model');
-
-    % Model construction
-    [ensemble,finalResult_pred] = buildAnEnsemble(M,k,nmin,subset);
-    model.complete_model.ensemble = ensemble;
-    model.complete_model.trajectories = finalResult_pred;
-
-    % Evaluate R2              
-    model.complete_model.performance.Rt2   = Rt2_fit(subset(:,end),finalResult_pred);
-
 else
-    
-    return
-    
+    [model] = crossvalidation_extra_tree_ensemble_c(subset,M,k,nmin,ns,inputType,flag);
+
 end
-
-
-% This code has been written by Stefano Galelli.
- 
-
-
-
-
-
-
-
-
 

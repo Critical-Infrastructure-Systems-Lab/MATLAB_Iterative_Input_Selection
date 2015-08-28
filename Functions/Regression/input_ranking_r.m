@@ -1,4 +1,4 @@
-function [result] = input_ranking(subset,M,k,nmin)
+function [result] = input_ranking_r(subset,M,k,nmin)
 
 % This function builds an ensemble of Exra-Trees and then ranks 
 % the input variables according to their importance
@@ -8,6 +8,7 @@ function [result] = input_ranking(subset,M,k,nmin)
 % M      = number of trees 
 % k      = number of random cut-directions 
 % nmin   = minimum number of points per leaf
+% inputType = binary vector indicating feature type (0:categorical, 1:numerical)
 %
 % Output: 
 % result = ranked score of each attribute
@@ -18,9 +19,11 @@ function [result] = input_ranking(subset,M,k,nmin)
 % stefano_galelli@sutd.edu.sg
 % http://people.sutd.edu.sg/~stefano_galelli/index.html
 %
+% Copyright 2015 Ahmad Alsahaf
+% Research fellow, Politecnico di Milano
+% ahmadalsahaf@gmail.com
 %
-% Please refer to README.txt for further information.
-%
+% Please refer to README.txt for more information
 %
 % This file is part of MATLAB_IterativeInputSelection.
 % 
@@ -43,9 +46,10 @@ function [result] = input_ranking(subset,M,k,nmin)
 
 % Build and ensemble of Extra Trees and get the score of each variable (for
 % each tree)
+
 rank_results = zeros(M,size(subset,2)-1);
 for i = 1 : M
-    [tree,output,rank_results(i,:)] = buildAnExtraTree(k,nmin,subset);   
+    [tree,output,rank_results(i,:)] = buildAnExtraTree_r(k,nmin,subset);   
 end
 
 % Compute, for each Extra-Tree, the score of each variable

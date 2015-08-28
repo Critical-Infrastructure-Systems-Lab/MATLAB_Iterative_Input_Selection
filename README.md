@@ -1,6 +1,8 @@
 MATLAB_IterativeInputSelection
 ==============================
 
+"Update August, 2015: the toolbox can now implement the IIS algorithm for classification problem. The MATLAB_ExtraTrees toolbox has been accordingly updated as well". 
+
 The MATLAB_IterativeInputSelection toolbox is a MatLab implementation of the Iterative Input Selection (IIS) algorithm proposed by Galelli and Castelletti (2013a). The underlying regression method adopted by the IIS algorithm is an ensemble of Extra-Trees (Geurts et al., 2006; Galelli and Castelletti, 2013b). The user is referred to the original publication for details regarding the IIS algorithm.  
 
 The MATLAB_IterativeInputSelection toolbox requires the MATLAB_ExtraTrees toolbox, which can be found at https://github.com/rtaormina/MATLAB_ExtraTrees.
@@ -28,6 +30,10 @@ Based on work from the following papers:
 - Geurts, P., D. Ernst, and L. Wehenkel (2006), Extremely randomized trees, Mach. Learn., 63(1), 3-42 ([Link to Paper](http://link.springer.com/article/10.1007/s10994-006-6226-1)).
 
 Acknowledgements: to Dr. Matteo Giuliani (Politecnico di Milano) and Riccardo Taormina (Hong Kong Polytechnic University).
+
+Copyright 2015 Ahmad Alsahaf 
+Research fellow, Politecnico di Milano 
+ahmadalsahaf@gmail.com 
 
 Copyright 2014 Stefano Galelli, Assistant Professor, Singapore University of Technology and Design, E-mail: stefano_galelli@sutd.edu.sg ([Link to Homepage](http://people.sutd.edu.sg/~stefano_galelli/index.html)).
 

@@ -1,4 +1,4 @@
-function [subset_out,idx] = shuffle_data(subset_in)
+function [subset_out,idx] = shuffle_data_c(subset_in)
 
 % This function builds an ensemble of Exra-Trees and then ranks 
 % the input variables according to their importance

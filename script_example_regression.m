@@ -1,7 +1,7 @@
 
 % This script shows how to use the functions available in the
-% MATLAB_IterativeInputSelection toolbox on a sample dataset. These
-% functions require the MATLAB_ExtraTrees toolbox, which can be found at
+% MATLAB_IterativeInputSelection toolbox on a regression sample dataset. These
+% functions require the MATLAB_ExtraTrees_classification toolbox, which can be found at
 % https://github.com/rtaormina/MATLAB_ExtraTrees.
 %
 %
@@ -12,8 +12,6 @@
 % Research Fellow, Politecnico di Milano
 % matteo.giuliani@polimi.it
 % http://giuliani.faculty.polimi.it
-%
-% Please refer to README.txt for further information.
 %
 %
 % This file is part of MATLAB_IterativeInputSelection.
@@ -33,13 +31,8 @@
 %     If not, see <http://www.gnu.org/licenses/>.
 % 
 
-
-%% Set workspace
 clear all
 clc
-
-% Addpath for the MATLAB_ExtraTrees toolbox
-addpath('..\MATLAB_ExtraTrees\');
 
 
 
@@ -58,22 +51,23 @@ subset_val = data(181:end,:);
 
 
 
+
 %% Set the parameters for the Extra-Trees
 
-M    =  25;  % Number of trees in the ensemble
-nmin =   5;  % Number of points per leaf
-k    =  10;  % Number of random cuts (it should be equal to the number of inputs)%
-
+M    =  25;       % Number of trees in the ensemble
+nmin =   5;       % Number of points per leaf
+k    =  10;       % Number of random cuts (it should be equal to the number of inputs)%
+problemType = 0;  % Problem type is regression 
 
 
 %% Calibrate and validate an ensemble of Extra-Trees
 
 % Build an ensemble of Extra-Trees and return the predictions on the
 % calibration dataset
-[ensemble,finalResult_cal] = buildAnEnsemble(M,k,nmin,subset_cal);
+[ensemble,finalResult_cal] = buildAnEnsemble(M,k,nmin,subset_cal,problemType);
 
 % Run the ensemble on a validation dataset
-[finalResult_val] = predictWithAnEnsemble(ensemble,subset_val);
+[finalResult_val] = predictWithAnEnsemble(ensemble,subset_val,problemType);
 
 % Calculate the model performance in calibration and validation
 Rt2_fit(subset_cal(:,end),finalResult_cal)  % 
@@ -117,7 +111,7 @@ flag = 1; % if flag == 1, an ensemble is built on the whole dataset at the end o
 data_sh = shuffle_data(data);
 
 % Run the cross-validation
-[model] = crossvalidation_extra_tree_ensemble(data_sh,M,k,nmin,ns,flag);
+[model] = crossvalidation_extra_tree_ensemble(data_sh,M,k,nmin,ns,flag,problemType);
 
 % Model performance in calibration and validation
 model.cross_validation.performance.Rt2_cal_pred_mean  % 
@@ -173,7 +167,7 @@ title('calibration - scatter plot');
 data_sh = shuffle_data(data);
 
 % Run the ranking algorithm
-[result_rank] = input_ranking(data_sh,M,k,nmin);
+[result_rank] = input_ranking_r(data_sh,M,k,nmin)
 
 % Results: Contribution (first column, %), Variable num. (secon column, [])
 %
@@ -202,10 +196,10 @@ max_iter = 6;   % maximum number of iterations
 % Shuffle the data
 data_sh = shuffle_data(data);
 
-% Run the IIS algorithm with k-fold validation (last input = 1)
-[result_iis] = iterative_input_selection(data_sh,M,nmin,ns,p,epsilon,max_iter,1);
+% Run the IIS algorithm with k-fold validation
+[result_iis] = iterative_input_selection(data_sh,M,nmin,ns,p,epsilon,max_iter,problemType,1);
 % for running the IIS algorithm with repeated random sub-sampling
-% validation, the last input must be = 2:
+% validation, the last last input must be = 2:
 % [result_iis] = iterative_input_selection(data_sh,M,nmin,ns,p,epsilon,max_iter,2);
 
 % Exit condition
@@ -471,7 +465,7 @@ end
 % Run the IIS algorithm
 for i = 1:mult_runs    
     eval(['data_sh' '=' 'data_sh_' num2str(i) ';']);
-    eval(['result_iis_' num2str(i) '=' 'iterative_input_selection(data_sh,M,nmin,ns,p,epsilon,max_iter);']);
+    eval(['result_iis_' num2str(i) '=' 'iterative_input_selection(data_sh,M,nmin,ns,p,epsilon,max_iter,problemType,1);']);
     eval(['results_iis_n{i} = result_iis_',num2str(i),';']);
     clear data_sh    
 end

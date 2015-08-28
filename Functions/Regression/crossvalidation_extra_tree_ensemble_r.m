@@ -1,15 +1,14 @@
-function [model] = repeatedRandomSubSamplingValidation_extra_tree_ensemble(subset,M,k,nmin,ns,flag)
+function [model] = crossvalidation_extra_tree_ensemble_r(subset,M,k,nmin,ns,flag)
 
 
-% This function runs a repeated random sub-sampling validation of an
-% ensemble of Exra-Trees  
+% This function cross-validates an ensemble of Exra-Trees 
 %
 % Inputs: 
 % subset = observations
 % M      = number of trees in the ensemble
 % k      = number of random cut-directions 
 % nmin   = minimum number of points per leaf 
-% ns     = number of repetitions
+% ns     = number of folds in the k-fold cross-validation process 
 % flag   = if flag == 1, the model is then evaluated (and saved) on the
 % full dataset
 %
@@ -17,10 +16,10 @@ function [model] = repeatedRandomSubSamplingValidation_extra_tree_ensemble(subse
 % model  = structure containing models and performance 
 %
 %
-% Copyright 2014 Matteo Giuliani
-% Research Fellow, Politecnico di Milano
-% matteo.giuliani@polimi.it
-% http://giuliani.faculty.polimi.it
+% Copyright 2014 Stefano Galelli
+% Assistant Professor, Singapore University of Technology and Design
+% stefano_galelli@sutd.edu.sg
+% http://people.sutd.edu.sg/~stefano_galelli/index.html
 %
 %
 % Please refer to README.txt for further information.
@@ -47,9 +46,11 @@ function [model] = repeatedRandomSubSamplingValidation_extra_tree_ensemble(subse
 
 % 0) SET THE PROBLEM PARAMETERS FOR THE ENSEMBLE CROSS-VALIDATION
 
-% Number of lines to be used for validation and calibration
-lv = floor(length(subset)/ns);
-l = length(subset)-lv ; 
+% Number of lines characterizing an alternative (a single fold)
+l = floor(length(subset)/ns);
+
+% Re-define the subset matrix
+subset = subset(1:l*ns,:);
 
 
 % 1) INITIALIZATION OF THE OUTPUT VARIABLES 
@@ -72,14 +73,25 @@ for i = 1:ns
     % disp('Start cross-validation:'); disp(i);
 
     % Define the calibration and validation data-set
-    [subset_tar, subset_val] = randomSampling_CalVal( subset, lv ) ;
+    % Calibration
+    if (i > 1) && (i < ns)
+        subset_tar = [subset(i*l+1:end,:) ; subset(1:(i-1)*l,:)];
+    else if i == 1
+            subset_tar = subset(i*l+1:end,:);
+        else
+            subset_tar = subset(1:(i-1)*l,:);
+        end
+    end
     
+    % Validation
+    subset_val = subset((i-1)*l+1:i*l,:);
+
     % Ensemble building + test the ensemble on the calibration dataset
-    [ensemble,finalResult_cal_pred] = buildAnEnsemble(M,k,nmin,subset_tar);
+    [ensemble,finalResult_cal_pred] = buildAnEnsemble_r(M,k,nmin,subset_tar);
      Rt2_cal_pred(i)                = Rt2_fit(subset_tar(:,end),finalResult_cal_pred);    
     
     % Test the ensemble on the validation data-set     
-    [finalResult_val_pred] = predictWithAnEnsemble(ensemble,subset_val);        
+    [finalResult_val_pred] = predictWithAnEnsemble_r(ensemble,subset_val);        
     Rt2_val_pred(i)        = Rt2_fit(subset_val(:,end),finalResult_val_pred);
 
 end
@@ -105,7 +117,7 @@ if flag == 1
     % disp('Building and testing the final model');
 
     % Model construction
-    [ensemble,finalResult_pred] = buildAnEnsemble(M,k,nmin,subset);
+    [ensemble,finalResult_pred] = buildAnEnsemble_r(M,k,nmin,subset);
     model.complete_model.ensemble = ensemble;
     model.complete_model.trajectories = finalResult_pred;
 
@@ -119,7 +131,7 @@ else
 end
 
 
-% This code has been written by Matteo Giuliani.
+% This code has been written by Stefano Galelli.
  
 
 
