@@ -1,14 +1,15 @@
-function [result] = input_ranking_c(subset,M,k,nmin,inputType)
+function [result] = input_ranking_c(subset,M,k,nmin,inputType,sampleWeights)
 
 % This function builds an ensemble of Exra-Trees and then ranks 
 % the input variables according to their importance
 %
 % Inputs:
-% subset = observations 
-% M      = number of trees 
-% k      = number of random cut-directions 
-% nmin   = minimum number of points per leaf
-% inputType = binary vector indicating feature type (0:categorical, 1:numerical)
+% subset        = observations 
+% M             = number of trees 
+% k             = number of random cut-directions 
+% nmin          = minimum number of points per leaf
+% inputType     = binary vector indicating feature type (0:categorical, 1:numerical)
+% sampleWeights = vector containing weights for each sample
 %
 % Output: 
 % result = ranked score of each attribute
@@ -43,7 +44,7 @@ function [result] = input_ranking_c(subset,M,k,nmin,inputType)
 
 rank_results = zeros(M,size(subset,2)-1);
 for i = 1 : M
-    [tree,output,rank_results(i,:)] = buildAnExtraTree_c(k,nmin,subset,inputType);   
+    [tree,output,rank_results(i,:)] = buildAnExtraTree_c(k,nmin,subset,inputType,sampleWeights);   
 end
 
 % Compute, for each Extra-Tree, the score of each variable

@@ -62,6 +62,7 @@ diff     = 1;    % exit flag
 l = floor(length(subset)/ns);
 subset = subset(1:l*ns,:);
 
+
 % Define the MISO model output
 miso_output = subset(:,end);
 
@@ -79,13 +80,16 @@ while (diff > epsilon) && (iter <= max_iter)
     disp('ITERATION:'); disp(iter);
     
     % Define the output variable to be used during the ranking
-    if iter == 1 
-        rank_output = miso_output; % at the first iteration the MISO model output and ranking output are the same variable%
-        rank_input = input;
+    rank_output = miso_output; 
+    rank_input  = input;
+    
+    % Define sample weights
+    if iter == 1       
+        sampleWeights = (1/(l*ns))*ones(l*ns,1);              % first iteration, weight samples evenly
     else         
-        rank_output = residual;    % at the other iterations, the ranking output is the residual of the previous MISO model%
-        rank_input = residual_input;
+        sampleWeights = new_weights*(1/sum(new_weights));    % weight according to previous classifier performance    
     end
+   
     
     % Define the ranking matrix
     matrix_ranking = [rank_input rank_output];
@@ -93,7 +97,7 @@ while (diff > epsilon) && (iter <= max_iter)
     % Run the feature ranking
     disp('Ranking:');
     k = size(input,2);
-    [ranking] = input_ranking_c(matrix_ranking,M,k,nmin,inputType);     
+    [ranking] = input_ranking_c(matrix_ranking,M,k,nmin,inputType,sampleWeights);     
     eval(['result.iter_' num2str(iter) '.ranking' '=' 'ranking;']);
     disp(ranking);
     
@@ -102,21 +106,8 @@ while (diff > epsilon) && (iter <= max_iter)
     features = ranking(1:p,2);                             % p features to be considered           
     performance = zeros(p,1);	                           % initialize a vector for the performance of the p SISO models%	
     
-    
-    if iter == 1
-        subset_r = subset;
-    else
-    %residual subset
-    % Re-define the subset matrix
-     subset_r = subset(residual_idx,:);
-     %display(size(subset_r))
-     l = floor(size(subset_r,1)/ns);
-     subset_r = subset_r(1:l*ns,:);
-    end
-    
-    
     for i = 1:p
-        [siso_model] = crossvalidation_extra_tree_ensemble_c([subset_r(:,features(i)) rank_output(1:l*ns,:)],M,1,nmin,ns,inputType,0);        
+        [siso_model] = crossvalidation_extra_tree_ensemble_c([subset(:,features(i)) rank_output(1:l*ns,:)],M,1,nmin,ns,inputType,sampleWeights,0);        
 		performance(i) = siso_model.cross_validation.performance.classPerf_val_pred_mean;
     end
     eval(['result.iter_' num2str(iter) '.SISO' '=' '[features performance];']);
@@ -128,38 +119,47 @@ while (diff > epsilon) && (iter <= max_iter)
     eval(['result.iter_' num2str(iter) '.best_SISO' '=' '[best_siso_input val];']);
     disp('Select variable:'); disp(best_siso_input);
     
-    % Check the exit condition
+    % Check the exit condition 
     if (all(miso_input - best_siso_input) == 0) 
         result.exit_condition = 'An input variable was selected twice';
         result.iters_done = iter;
         return
     end
         
+%     % force algorithms to keep going
+%     if (all(miso_input - best_siso_input) == 0) 
+%         miso_input = unique(miso_input);
+%     end
+
+
+
 	% Build a MISO model with the selected inputs	
     disp('Evaluating MISO model:');
 	miso_input = [miso_input best_siso_input];				 
 	k = length(miso_input);	
-	[miso_model] = crossvalidation_extra_tree_ensemble_c([subset(:,miso_input) miso_output],M,k,nmin,ns,inputType,1);				 
+    misoWeight = (1/(ns*l))*ones(ns*l,1);
+	[miso_model] = crossvalidation_extra_tree_ensemble_c([subset(:,miso_input) miso_output],M,k,nmin,ns,inputType,misoWeight,1);				 
     eval(['miso_model_' num2str(iter) '= miso_model;']);
     eval(['result.iter_' num2str(iter) '.MISO' '=' 'miso_model;']);
     disp(miso_model.cross_validation.performance.classPerf_val_pred_mean);
 	
-    % Evaluate the performance of the MISO model and calculate the
-    % difference with respect to the previous MISO model
+    % Evaluate the performance of the MISO model and calculate the difference with respect to the previous MISO model
     if iter == 1   % at the first iteration, use a default value
         diff = 1;
     else
-        diff = miso_model.cross_validation.performance.classPerf_val_pred_mean - eval(['miso_model_' num2str(iter-1) '.cross_validation.performance.classPerf_val_pred_mean']); 
+        diff = miso_model.cross_validation.performance.classPerf_val_pred_mean ...
+            - eval(['miso_model_' num2str(iter-1) '.cross_validation.performance.classPerf_val_pred_mean']); 
     end	
         
-	% Compute the MISO model residual by removing misclassified samples
+	% Compute the MISO model residual by weighting classified samples
     residual_idx = miso_model.complete_model.performance.misClassified;
-	residual = miso_output;
-    %display(size(residual))
-    residual(residual_idx,:) = [];
-    residual_input = input;
-    residual_input(residual_idx,:) = [];
+	correct_idx = miso_model.complete_model.performance.Classified;
 
+    new_weights = zeros(ns*l,1);
+    eps_r = 1-miso_model.complete_model.performance.classPerf;  % error = ratio of misclassification weights
+    beta_r = eps_r/(1-eps_r);                                   % odds of a fake classification
+    new_weights(residual_idx)=sampleWeights(residual_idx);      % weight of misclassified samples fixed
+    new_weights(correct_idx)=sampleWeights(correct_idx)*beta_r; % multiply classified sample weights by beta_r
     
     
 	% Update the counter				 

@@ -1,4 +1,4 @@
-function    [R, idx] = class_perf(yo,ys)
+function    [R, idx1, idx2] = class_perf(yo,ys,sampleWeights)
 
 % This function calculates measures the performance of classification
 % as the percentace of correct classifications (to be modified)
@@ -9,7 +9,8 @@ function    [R, idx] = class_perf(yo,ys)
 %
 % Output
 % R   = percentage of correct classifications
-% idx = indices of incorrect classifications
+% idx1 = indices of incorrect classifications
+% idx2 = indices of correct classifications
 %
 %
 % Copyright 2015 Ahmad Alsahaf
@@ -37,18 +38,62 @@ function    [R, idx] = class_perf(yo,ys)
 
 
 
-if(nargin ~= 2)
+if(nargin >3)
   disp(  'error: wrong number of inputs'  )
   return;
 end;
 
 
 temp = ys - yo;
-R = numel(find(~temp))/numel(yo);
+
+if nargin <3
+    R = numel(find(~temp))/numel(yo);
+else
+    R = sum(sampleWeights(find(~temp)))/sum(sampleWeights);
+end
 
 
-% find indices of mis-classified entries.
-idx = find(temp);           
+% find indices of mis-classified and classified entries.
+idx1 = find(temp);           
+idx2 = find(~temp); 
 
 
-% This code has been written by Ahmad Alsahaf
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+% classes  = unique(yo);
+% nClasses = numel(unique(yo));
+% if nClasses == 2
+%     nClasses = 1; % handle binary classification
+% end
+%     
+% 
+% Acc = zeros(1,nClasses);
+% for j = 1 : nClasses
+% %     if nClasses == 1
+% %         thisClass = 2; % the H1
+% %     else
+%         thisClass = classes(j);
+% %     end
+%     % ixes 
+%     ixes1 = (yo == thisClass);        
+%     ixes2 = (ys == thisClass); 
+%     % compute confusion matrix
+%     tp = sum((ixes1==ixes2)&(ixes1==1));
+%     tn = sum((ixes1==ixes2)&(ixes1==0));
+%     fn = sum((ixes1-ixes2)==1);
+%     fp = sum((ixes1-ixes2)==-1);    
+%     % compute accuracy
+%     Acc(j) = (tp+tn)/(tp+fn+fp+tn);
+% end
+% % get average accuracy
+% R = mean(Acc);
+% 
+% 
+
+
+
+

@@ -41,29 +41,29 @@ data = importdata('census.mat');
 data = data(randperm(n),:);
 
 % split dataset into training and testing
-trainSet = data(1:2000,:);
+trainSet = data(1:1000,:);
 testSet = data(2001:end,:);
 
-% Add aritifial features to the data set before IIS
-nff = 1;     %number of artificial features to add
-fake_features = zeros(size(trainSet,1),nff);
-for i=1:nff
-    x = randi([1 4]);
-    fake_features(:,i) = randi([0 x],size(trainSet,1),1);
-end
+%  %Add aritifial features to the data set before IIS
+% nff = 1;     %number of artificial features to add
+% fake_features = zeros(size(trainSet,1),nff);
+% for i=1:nff
+%     x = randi([1 4]);
+%     fake_features(:,i) = randi([0 x],size(trainSet,1),1);
+% end
+% 
+% 
+% % append artificial features after real features
+% trainSet_and_fake = [trainSet(:,1:end-1) fake_features trainSet(:,end)];
 
 
-% append artificial features after real features
-trainSet_and_fake = [trainSet(:,1:end-1) fake_features trainSet(:,end)];
-
-
-% IIS algorithm traning parameters
-subset = trainSet_and_fake;
-M = 10;
-nmin = 2;
+% IIS algorithm training parameters
+subset = trainSet;
+M = 50;
+nmin = 3;
 ns = 10;
-p = 5;
-epsilon = 0.0001;
+p = 4;
+epsilon = eps;
 max_iter = 10;
 problemType = 1;
 Vflag = 1;
@@ -71,5 +71,36 @@ inputType = zeros(size(subset,2)-1,1);
 
 
 % Run IIS algorithm 
-result = iterative_input_selection(trainSet_and_fake,M,nmin,ns,p,epsilon,max_iter,problemType,Vflag,inputType)
+result = iterative_input_selection(subset,M,nmin,ns,p,epsilon,max_iter,problemType,Vflag,inputType)
+
+
+
+%------------------------------------------------------------------------------------------------------------------
+%%  Second example:  Heart disease data from UCI repository
+
+clear all
+clc
+
+% import and define dataset
+data = csvread('Heart.csv',1,0);
+subset = data(2:end,:);
+inputType = data(1,1:end-1);
+[n m] = size(subset);
+subset = subset(randperm(n),:);
+
+
+% IIS algorithm training parameters
+M = 100;
+nmin = 3;
+ns = 10;
+p = 5;
+epsilon = -1;
+max_iter = 10;
+problemType = 1;
+Vflag = 1;
+
+
+
+% Run IIS algorithm 
+result = iterative_input_selection(subset,M,nmin,ns,p,epsilon,max_iter,problemType,Vflag,inputType)
 

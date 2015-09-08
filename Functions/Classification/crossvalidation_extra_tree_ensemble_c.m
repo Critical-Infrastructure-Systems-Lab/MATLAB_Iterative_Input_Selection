@@ -1,4 +1,4 @@
-function [model] = crossvalidation_extra_tree_ensemble_c(subset,M,k,nmin,ns,inputType,flag)
+function [model] = crossvalidation_extra_tree_ensemble_c(subset,M,k,nmin,ns,inputType,sampleWeights,flag)
 
 
 % This function cross-validates an ensemble of Exra-Trees 
@@ -52,9 +52,9 @@ function [model] = crossvalidation_extra_tree_ensemble_c(subset,M,k,nmin,ns,inpu
 % Number of lines characterizing an alternative (a single fold)
 l = floor(length(subset)/ns);
 
-% Re-define the subset matrix
+% Re-define the subset matrix and the sampleWeights
 subset = subset(1:l*ns,:);
-
+sampleWeights = sampleWeights(1:l*ns);
 
 % 1) INITIALIZATION OF THE OUTPUT VARIABLES 
 
@@ -78,23 +78,27 @@ for i = 1:ns
     % Calibration
     if (i > 1) && (i < ns)
         subset_tar = [subset(i*l+1:end,:) ; subset(1:(i-1)*l,:)];
+        sampleWeights_tar = [sampleWeights(i*l+1:end,:) ; sampleWeights(1:(i-1)*l,:)];
     else if i == 1
             subset_tar = subset(i*l+1:end,:);
+            sampleWeights_tar = sampleWeights(i*l+1:end,:);
         else
             subset_tar = subset(1:(i-1)*l,:);
+            sampleWeights_tar = sampleWeights(1:(i-1)*l,:);
         end
     end
     
     % Validation
     subset_val = subset((i-1)*l+1:i*l,:);
+    sampleWeights_val = sampleWeights((i-1)*l+1:i*l,:);
 
     % Ensemble building + test the ensemble on the calibration dataset
-    [ensemble,finalResult_cal_pred] = buildAnEnsemble_c(M,k,nmin,subset_tar,inputType);
-    classPerf_cal_pred(i)                = class_perf(subset_tar(:,end),finalResult_cal_pred);    
+    [ensemble,finalResult_cal_pred] = buildAnEnsemble_c(M,k,nmin,subset_tar,inputType,sampleWeights_tar);
+    classPerf_cal_pred(i)           = class_perf(subset_tar(:,end),finalResult_cal_pred,sampleWeights_tar);    
     
     % Test the ensemble on the validation data-set     
     [finalResult_val_pred] = predictWithAnEnsemble_c(ensemble,subset_val(:,1:end-1));        
-    classPerf_val_pred(i)        = class_perf(subset_val(:,end),finalResult_val_pred);
+    classPerf_val_pred(i)        = class_perf(subset_val(:,end),finalResult_val_pred,sampleWeights_val);
 
 end
 
@@ -119,13 +123,14 @@ if flag == 1
     % disp('Building and testing the final model');
 
     % Model construction
-    [ensemble,finalResult_pred] = buildAnEnsemble_c(M,k,nmin,subset,inputType);
+    [ensemble,finalResult_pred] = buildAnEnsemble_c(M,k,nmin,subset,inputType,sampleWeights);
     model.complete_model.ensemble = ensemble;
     model.complete_model.trajectories = finalResult_pred;
 
     % Evaluate performance             
     [model.complete_model.performance.classPerf, ...
-       model.complete_model.performance.misClassified] ...
+       model.complete_model.performance.misClassified, ...
+       model.complete_model.performance.Classified] ...
        = class_perf(subset(:,end),finalResult_pred);
     
 else
