@@ -9,7 +9,7 @@ function [result] = iterative_input_selection(subset,M,nmin,ns,p,epsilon,max_ite
 %            candidate inputs).
 % epsilon     = tolerance
 % max_iter    = maximum number of iterations
-% problemType = specify problem type (1 for regression, zero for classification)
+% problemType = specify problem type (0 for regression, 1 for classification)
 % Vflag       = selection of the type of validation, 
 %               1 = k-fold(default)
 %               2= repeated random sub-sampling
