@@ -148,7 +148,7 @@ while (diff > epsilon) && (iter <= max_iter)
         diff = 1;
     else
         diff = miso_model.cross_validation.performance.classPerf_val_pred_mean ...
-            - eval(['miso_model_' num2str(iter-1) '.cross_validation.performance.classPerf_val_pred_mean']); 
+            - eval(['miso_model_' num2str(iter-1) '.cross_validation.performance.classPerf_val_pred_mean'])
     end	
         
 	% Compute the MISO model residual by weighting classified samples
@@ -168,11 +168,11 @@ while (diff > epsilon) && (iter <= max_iter)
     % Check the exit condition
     if iter > max_iter 
         result.exit_condition = 'The maximum number of iterations was reached'; 
-        result.iters_done = iter;
+        result.iters_done = iter-1;
     end
     if diff <= epsilon  
         result.exit_condition = 'The tolerance epsilon was reached';    
-        result.iters_done = iter;
+        result.iters_done = iter-1;
     end
     
 end
