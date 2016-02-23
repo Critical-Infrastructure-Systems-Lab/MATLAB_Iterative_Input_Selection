@@ -67,7 +67,7 @@ epsilon = eps;
 max_iter = 10;
 problemType = 1;
 Vflag = 1;
-inputType = zeros(size(subset,2)-1,1);
+inputType = logical(zeros(size(subset,2)-1,1));
 
 
 % Run IIS algorithm 
@@ -84,7 +84,7 @@ clc
 % import and define dataset
 data = csvread('Heart.csv',1,0);
 subset = data(2:end,:);
-inputType = data(1,1:end-1);
+inputType = logical(data(1,1:end-1));
 [n m] = size(subset);
 subset = subset(randperm(n),:);
 
